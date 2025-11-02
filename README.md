@@ -1,2 +1,2 @@
-# easyrenamer
-The easiest way to batch rename your folder images.
+# EasyRenamer
+EasyRenamer - Easy batch image renaming.
