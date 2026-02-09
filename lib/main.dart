@@ -46,6 +46,7 @@ class _HomePageState extends State<HomePage> {
   SortBy _sortBy = SortBy.name;
   bool _recursive = false;
   bool _useUnderscore = true; // New: Toggle for underscore
+  bool _baseNameFirst = true; // true: img_001 | false: 001_img
 
   // State
   List<RenameItem> _plan = [];
@@ -67,6 +68,7 @@ class _HomePageState extends State<HomePage> {
     '.svg',
     '.heif',
     '.ARW',
+    '.mp4',
   };
 
   @override
@@ -188,10 +190,13 @@ class _HomePageState extends State<HomePage> {
       final ext = p.extension(src.path);
       final numStr = (startIndex + i).toString().padLeft(pad, '0');
 
-      // NEW: Conditionally add underscore based on checkbox
-      final newName = _useUnderscore
-          ? '${base}_$numStr$ext' // With underscore: img_001.jpg
-          : '$base$numStr$ext'; // Without underscore: img001.jpg
+      final separator = _useUnderscore ? '_' : '';
+
+      final newName = _baseNameFirst
+          // img_001.jpg OR img001.jpg
+          ? '$base$separator$numStr$ext'
+          // 001_img.jpg OR 001img.jpg
+          : '$numStr$separator$base$ext';
 
       final targetPath = p.join(folder, newName);
 
@@ -413,6 +418,37 @@ class _HomePageState extends State<HomePage> {
                             message:
                                 'When checked: basename_001.jpg\nWhen unchecked: basename001.jpg',
                             child: const Icon(Icons.help_outline, size: 18),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      Row(
+                        children: [
+                          const Text('Order:'),
+                          const SizedBox(width: 5),
+                          ChoiceChip(
+                            label: const Text('Base first'),
+                            selected: _baseNameFirst,
+                            onSelected: (v) {
+                              setState(() => _baseNameFirst = true);
+                              _buildPreview();
+                            },
+                          ),
+                          const SizedBox(width: 5),
+                          ChoiceChip(
+                            label: const Text('Number first'),
+                            selected: !_baseNameFirst,
+                            onSelected: (v) {
+                              setState(() => _baseNameFirst = false);
+                              _buildPreview();
+                            },
+                          ),
+                          const SizedBox(width: 5),
+                          const Tooltip(
+                            message:
+                                'Base first: img_001.jpg\nNumber first: 001_img.jpg',
+                            child: Icon(Icons.help_outline, size: 18),
                           ),
                         ],
                       ),
